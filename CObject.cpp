@@ -1,14 +1,14 @@
-﻿#include "Object.h"
+﻿#include "CObject.h"
 
 #include <iostream>
 
-#include "VirtualMachine.h"
+#include "GCManager.h"
 
-UObject::UObject(): Reachablity(false), Type(ObjectType::OBJ_INT), Next(nullptr), Value(0)
+GCObject::GCObject(): Reachablity(false), Type(ObjectType::OBJ_INT), Next(nullptr), Value(0)
 {
 }
 
-UObject::UObject(VirtualMachine* InVM, ObjectType InType): Reachablity(false), Type(InType), Value(0)
+GCObject::GCObject(GCManager* InVM, ObjectType InType): Reachablity(false), Type(InType), Value(0)
 {
     if (InVM)
     {
@@ -17,19 +17,19 @@ UObject::UObject(VirtualMachine* InVM, ObjectType InType): Reachablity(false), T
     }
 }
 
-UObject* UObject::NewObject(VirtualMachine* VM, ObjectType Type)
+GCObject* GCObject::NewObject(GCManager* VM, ObjectType Type)
 {
     if (VM->NumObjects == VM->MaxObjects)
     {
         VM->GC();
     }
 
-    UObject* Obj = new UObject(VM, Type);
+    GCObject* Obj = new GCObject(VM, Type);
     VM->NumObjects++;
     return Obj;
 }
 
-void UObject::Mark()
+void GCObject::Mark()
 {
     if (Reachablity) return;
 
@@ -42,7 +42,7 @@ void UObject::Mark()
     }
 }
 
-void UObject::Print()
+void GCObject::Print()
 {
     switch (Type)
     {

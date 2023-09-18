@@ -4,26 +4,26 @@
 #define INIT_OBJ_NUM_MAX 8
 #include <vector>
 
-class UObject;
+class GCObject;
 
-class VirtualMachine
+class GCManager
 {
 public:
-    VirtualMachine();
+    GCManager();
 
-    ~VirtualMachine();
+    ~GCManager();
 
-    static VirtualMachine* NewVM();
+    static GCManager* NewVM();
 
-    static void DeleteVM(VirtualMachine* VM);
+    static void DeleteVM(GCManager* VM);
 
-    void Push(UObject* Obj);
+    void Push(GCObject* Obj);
 
-    UObject* Pop();
+    GCObject* Pop();
     
     void PushInt(int Val);
 
-    UObject* PushPair();
+    GCObject* PushPair();
 
     void Mark();
     
@@ -31,12 +31,12 @@ public:
     
     void GC();
 
-    std::vector<UObject*> Stack;
+    std::vector<GCObject*> Stack;
     
     int StackSize;
 
     // The first object in the linked list of all objects on the heap.
-    UObject* FirstObject;
+    GCObject* FirstObject;
 
     // The total number of currently allocated objects.
     int NumObjects;

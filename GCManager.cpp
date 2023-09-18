@@ -1,62 +1,62 @@
-﻿#include "VirtualMachine.h"
+﻿#include "GCManager.h"
 
 #include "Helper.h"
-#include "Object.h"
+#include "CObject.h"
 
-VirtualMachine::VirtualMachine(): StackSize(0), FirstObject(nullptr), NumObjects(0), MaxObjects(INIT_OBJ_NUM_MAX)
+GCManager::GCManager(): StackSize(0), FirstObject(nullptr), NumObjects(0), MaxObjects(INIT_OBJ_NUM_MAX)
 {
 }
 
-VirtualMachine::~VirtualMachine()
+GCManager::~GCManager()
 {
 }
 
-VirtualMachine* VirtualMachine::NewVM()
+GCManager* GCManager::NewVM()
 {
-    VirtualMachine* vm = new VirtualMachine;
+    GCManager* vm = new GCManager;
     return vm;
 }
 
-void VirtualMachine::DeleteVM(VirtualMachine* VM)
+void GCManager::DeleteVM(GCManager* VM)
 {
     VM->StackSize = 0;
     VM->GC();
     delete VM;
 }
 
-void VirtualMachine::Push(UObject* Obj)
+void GCManager::Push(GCObject* Obj)
 {
     Check(StackSize < STACK_MAX, "Stack overflow!");
     Stack.push_back(Obj);
     StackSize++;
 }
 
-UObject* VirtualMachine::Pop()
+GCObject* GCManager::Pop()
 {
     Check(StackSize > 0, "Stack underflow!");
-    UObject* Obj = Stack.back();
+    GCObject* Obj = Stack.back();
     Stack.pop_back();
     StackSize--;
     return Obj;
 }
 
-void VirtualMachine::PushInt(int Val)
+void GCManager::PushInt(int Val)
 {
-    UObject* Obj = UObject::NewObject(this, ObjectType::OBJ_INT);
+    GCObject* Obj = GCObject::NewObject(this, ObjectType::OBJ_INT);
     Obj->Value = Val;
     Push(Obj);
 }
 
-UObject* VirtualMachine::PushPair()
+GCObject* GCManager::PushPair()
 {
-    UObject* Obj = UObject::NewObject(this, ObjectType::OBJ_PAIR);
+    GCObject* Obj = GCObject::NewObject(this, ObjectType::OBJ_PAIR);
     Obj->Tail = Pop();
     Obj->Head = Pop();
     Push(Obj);
     return Obj;
 }
 
-void VirtualMachine::Mark()
+void GCManager::Mark()
 {
     for (int i = 0; i < StackSize; i++)
     {
@@ -64,14 +64,14 @@ void VirtualMachine::Mark()
     }
 }
 
-void VirtualMachine::Sweep()
+void GCManager::Sweep()
 {
-    UObject** object = &FirstObject;
+    GCObject** object = &FirstObject;
     while (*object)
     {
         if (!(*object)->Reachablity)
         {
-            UObject* unreached = *object;
+            GCObject* unreached = *object;
             *object = unreached->Next;
 
             delete unreached;
@@ -85,7 +85,7 @@ void VirtualMachine::Sweep()
     }
 }
 
-void VirtualMachine::GC()
+void GCManager::GC()
 {
     int NumCache = NumObjects;
     Mark();

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-class VirtualMachine;
+class GCManager;
 
 enum class ObjectType
 {
@@ -11,18 +11,18 @@ enum class ObjectType
 /**
  * \brief Base type which support GC, like UObject in unreal engine
  */
-class UObject
+class GCObject
 {
 public:
-    UObject();
+    GCObject();
 
-    UObject(VirtualMachine* InVM, ObjectType InType);
+    GCObject(GCManager* InVM, ObjectType InType);
 
-    ~UObject()
+    ~GCObject()
     {
     }
 
-    static UObject* NewObject(VirtualMachine* VM, ObjectType Type);
+    static GCObject* NewObject(GCManager* VM, ObjectType Type);
 
     void Mark();
 
@@ -31,7 +31,7 @@ public:
     ObjectType Type;
 
     // The next object in the linked list of heap allocated objects.
-    UObject* Next;
+    GCObject* Next;
 
     // Data
     union
@@ -42,8 +42,8 @@ public:
         // OBJ_PAIR
         struct
         {
-            UObject* Head;
-            UObject* Tail;
+            GCObject* Head;
+            GCObject* Tail;
         };
     };
 
